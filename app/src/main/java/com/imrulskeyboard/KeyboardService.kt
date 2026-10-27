@@ -145,7 +145,7 @@ class KeyboardService : InputMethodService() {
             typeface=Typeface.create("sans-serif-condensed", Typeface.BOLD); includeFontPadding=false; maxLines=1
             setPadding(dp(1),0,dp(1),0)
             background=GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(lighten(color),color, darken(color))).apply {
-                cornerRadius=dp(9).toFloat(); setStroke(dp(if(outlined) 1 else 0), if(outlined) Color.argb(130, t.accent) else color)
+                cornerRadius=dp(9).toFloat(); setStroke(dp(if(outlined) 1 else 0), if(outlined) Color.argb(130, Color.red(t.accent), Color.green(t.accent), Color.blue(t.accent)) else color)
             }
             elevation=dp(2).toFloat(); isClickable=true; isFocusable=true
             contentDescription=if(label.isBlank()) "Space" else label
@@ -178,7 +178,7 @@ class KeyboardService : InputMethodService() {
             dict.entries.firstOrNull { p.startsWith(it.key) }?.value ?: listOf(prefix, prefix+"s", prefix+"ing")
         }
         candidates.take(3).forEachIndexed { i,s ->
-            val label=TextView(this).apply { text=s; textSize=12f; gravity=Gravity.CENTER; setTextColor(t.text); maxLines=1; background=GradientDrawable().apply { setColor(if(i==0) t.alternate else t.key); cornerRadius=dp(7).toFloat(); setStroke(dp(1),Color.argb(80,t.accent)) }; setOnClickListener { if(s=="✦ Themes" || s=="⚙ Settings") showThemes() else if(s=="🎙 Voice") toggleVoice() else { currentInputConnection?.deleteSurroundingText(32,0); commit(s+" ") } } }
+            val label=TextView(this).apply { text=s; textSize=12f; gravity=Gravity.CENTER; setTextColor(t.text); maxLines=1; background=GradientDrawable().apply { setColor(if(i==0) t.alternate else t.key); cornerRadius=dp(7).toFloat(); setStroke(dp(1),Color.argb(80,Color.red(t.accent),Color.green(t.accent),Color.blue(t.accent))) }; setOnClickListener { if(s=="✦ Themes" || s=="⚙ Settings") showThemes() else if(s=="🎙 Voice") toggleVoice() else { currentInputConnection?.deleteSurroundingText(32,0); commit(s+" ") } } }
             target.addView(label, LinearLayout.LayoutParams(0,dp(29),1f).apply { setMargins(dp(2),dp(1),dp(2),dp(1)) })
         }
     }
