@@ -6,6 +6,10 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
+import android.os.Build
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Gravity
@@ -56,9 +60,17 @@ class MainActivity : Activity() {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showInputMethodPicker()
         }, fullWidth().apply { topMargin = dp(12) })
+        content.addView(makeButton("Choose custom keyboard background") {
+            val pick = Intent(Intent.ACTION_OPEN_DOCUMENT).apply { addCategory(Intent.CATEGORY_OPENABLE); type = "image/*"; addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) }
+            startActivityForResult(pick, 712)
+        }, fullWidth().apply { topMargin = dp(12) })
+        content.addView(makeButton("Enable voice typing permission") {
+            if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 713)
+            else makeToast("Microphone permission already granted")
+        }, fullWidth().apply { topMargin = dp(12) })
 
         val note = TextView(this).apply {
-            text = "1. Enable Imruls Keyboard in system settings.\n2. Choose Imruls Keyboard from the keyboard picker.\n\nEnglish only • Black premium theme"
+            text = "1. Enable Imruls Keyboard in system settings.\n2. Choose it from the keyboard picker.\n3. Open the keyboard settings icon to choose 22 RGB themes.\n\nEnglish • Mechanical keys • Suggestions • Voice input • Custom background"
             textSize = 13f
             gravity = Gravity.CENTER
             setTextColor(Color.GRAY)
@@ -74,6 +86,17 @@ class MainActivity : Activity() {
         setContentView(scroll)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 712 && resultCode == RESULT_OK) {
+            val uri = data?.data ?: return
+            try { contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) } catch (_: Exception) {}
+            getSharedPreferences("keyboard_settings", Context.MODE_PRIVATE).edit().putString("background_uri", uri.toString()).apply()
+            makeToast("Background saved. Reopen the keyboard to apply it.")
+        }
+    }
+
+    private fun makeToast(message: String) = android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
     private fun fullWidth() = LinearLayout.LayoutParams(-1, dp(56))
 
     private fun makeButton(label: String, action: () -> Unit): TextView {
