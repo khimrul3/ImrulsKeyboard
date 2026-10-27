@@ -9,6 +9,7 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Gravity
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -68,7 +69,7 @@ class MainActivity : Activity() {
         val scroll = ScrollView(this).apply {
             isFillViewport = true
             setBackgroundColor(bg)
-            addView(content, ScrollView.LayoutParams(-1, -2))
+            addView(content, ViewGroup.LayoutParams(-1, -2))
         }
         setContentView(scroll)
     }
